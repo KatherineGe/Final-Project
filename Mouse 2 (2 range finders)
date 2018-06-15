@@ -1,0 +1,297 @@
+int led = 13;
+int AIN1 = 7;
+int AIN2 = 8;
+int BIN1 = 9;
+int BIN2 = 10;
+int motorPWMA = 6;
+int motorPWMB = 5;
+int triggerPin1 = 11;
+int echoPin1 = 12;
+int triggerPin2 = 3;
+int echoPin2 = 2;
+
+
+void setup() {
+  pinMode(led, OUTPUT);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+  Serial.begin(19200);
+  pinMode(triggerPin1, OUTPUT);
+  pinMode(echoPin1, INPUT);
+  digitalWrite(triggerPin1, LOW);
+  pinMode(triggerPin2, OUTPUT);
+  pinMode(echoPin2, INPUT);
+  digitalWrite(triggerPin2, LOW);
+}
+
+void forward(int howfast) {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW);
+
+  analogWrite(motorPWMA, howfast);
+  analogWrite(motorPWMB, howfast);
+
+
+}
+
+void backward(int howfast) {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, HIGH);
+
+  analogWrite(motorPWMA, howfast);
+  analogWrite(motorPWMB, howfast);
+
+
+}
+
+void right() {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW);
+
+  analogWrite(motorPWMA, 255);
+  analogWrite(motorPWMB, 128);
+
+
+}
+
+void left() {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW);
+
+  analogWrite(motorPWMA, 128);
+  analogWrite(motorPWMB, 255);
+
+}
+
+void bright() {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, HIGH);
+
+  analogWrite(motorPWMA, 255);
+  analogWrite(motorPWMB, 128);
+
+
+}
+
+void bleft() {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, HIGH);
+
+  analogWrite(motorPWMA, 128);
+  analogWrite(motorPWMB, 255);
+
+}
+
+void spinleft() {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW);
+
+  analogWrite(motorPWMA, 120);
+  analogWrite(motorPWMB, 120);
+
+}
+
+void spinright() {
+  digitalWrite(led, HIGH);
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, HIGH);
+
+  analogWrite(motorPWMA, 120);
+  analogWrite(motorPWMB, 120);
+
+}
+
+void stop() {
+  digitalWrite(led, LOW);
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, LOW);
+
+}
+
+float ping(int trigger, int echo) {
+  unsigned long maxTime = 20000;
+  unsigned long us;
+  float inches;
+  // Hold triggerPin high for at least 10us
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigger, LOW);
+  // Measure length of high pulse on echoPin
+  us = pulseIn(echo, HIGH, maxTime);
+  // pulseIn returns 0 on timeout. Assume worst case.
+  if (us == 0) {
+    us = maxTime;
+  }
+  // Convert roundtrip microseconds to inches
+  inches = us * 0.013504 / 2;
+  return inches;
+}
+
+void loop() {
+  stop();
+  delay(60);
+  float inches1 = ping(triggerPin1, echoPin1);
+  float inches2 = ping(triggerPin2, echoPin2);
+  Serial.print(inches1);
+  Serial.print("    ");
+  Serial.println(inches2);
+  delay(60);
+
+
+  if (inches1 < inches2) {
+    if (inches1 < 10) {
+      Serial.println("1 less than 10");
+      backward(255);
+      delay(500);
+      bleft();
+      delay(300);
+      bright();
+      delay(300);
+    }
+
+    else if (inches1 < 18) {
+      Serial.println("1 less than 18");
+      backward(120);
+      delay(600);
+      bleft();
+      delay(400);
+      stop();
+    }
+
+    else if (inches1 < 25 ) {
+      Serial.println("1 less than 25");
+      spinleft();
+      delay(300);
+      spinright();
+      delay(300);
+      stop();
+    }
+
+    else if (inches1 < 33 ) {
+      Serial.println("1 less than 33");
+      forward(120);
+      delay(500);
+
+    }
+
+    else if (inches1 < 40) {
+    Serial.println("1 less than 40");
+    right();
+    delay(300);
+    left();
+    delay(300);
+    stop();
+   }
+
+   else if (inches2 < 50) {
+    Serial.println("2 less than 50");
+    spinleft();
+    delay(200);
+    spinright();
+    delay(300);
+    spinleft();
+    delay(200);
+    stop();
+   }
+   
+    else {
+      Serial.println("1 bigger than 50");
+      stop();
+    }
+  }
+
+
+
+else {
+  if (inches2 < 10) {
+    Serial.println("2 less than 10");
+    forward(255);
+    delay(500);
+    right();
+    delay(300);
+  }
+
+  else if (inches2 < 18) {
+    Serial.println("2 less than 18");
+    forward(200);
+    delay(600);
+    left();
+    delay(400);
+    stop();
+  }
+
+
+
+  else if (inches2 < 25) {
+    Serial.println("2 less than 25");
+    right();
+    delay(200);
+    spinleft();
+    delay(400);
+    stop();
+  }
+
+    else if (inches2 < 33) {
+    Serial.println("2 less than 33");
+    forward(200);
+    delay(300);
+    backward(200);
+    delay(300);
+    stop();
+  }
+  
+
+   else if (inches2 < 40) {
+    Serial.println("2 less than 40");
+    spinleft();
+    delay(500);
+    spinright();
+    delay(200);
+    stop();
+   }
+
+    else if (inches2 < 50) {
+    Serial.println("2 less than 50");
+    bleft();
+    delay(300);
+    bright();
+    delay(300);
+    stop();
+   }
+  
+    else {
+      Serial.println("2 bigger than 50");
+      stop();
+
+    }
+  
+
+}
+}
